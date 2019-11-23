@@ -1,15 +1,18 @@
+import sys
+
 import numpy as np
 
 from robot import Robot
 from plotmap import plotMap, plotEstimate, plotMeasurement, plotError
 from ekf import predict, update
+from params import n, mapsize
 
 ## https://www.cs.utexas.edu/~pstone/Courses/393Rfall11/resources/RC09-Quinlan.pdf
 
 # In[Generate static landmarks]
 
-n = 50 # number of static landmarks
-mapsize = 40
+# n = 50 # number of static landmarks
+# mapsize = 40
 landmark_xy = mapsize*(np.random.rand(n,2)-0.5)
 landmark_id = np.transpose([np.linspace(0,n-1,n,dtype='uint16')])
 ls = np.append(landmark_xy,landmark_id,axis=1)
@@ -75,7 +78,7 @@ for j in range(1,steps):
 # generate robot states and observations
 for movement, t in zip(u,range(steps)):
     landmarks = np.append(ls,ldt[:,:3,t],axis=0)
-    
+
     # process robot movement
     x_true.append(r1.move(movement))
     obs.append(r1.sense(landmarks))
@@ -101,13 +104,13 @@ for movement, measurement in zip(u, obs):
     mu_new, cov = predict(mu_new, cov, movement, Rt)
     mu = np.append(mu,mu_new,axis=1)
     plotEstimate(mu, cov, r1, mapsize)
-    
+
     print('Measurements: {0:d}'.format(len(measurement)))
     mu_new, cov, c_prob_new = update(mu_new, cov, measurement, c_prob[:,-1].reshape(n+k,1), Qt)
     mu = np.append(mu,mu_new,axis=1)
     c_prob = np.append(c_prob, c_prob_new, axis=1)
     plotEstimate(mu, cov, r1, mapsize)
     plotMeasurement(mu_new, cov, measurement, n)
-    
+
     plotError(mu,x_true[:len(mu[:,0::2])][:])
     print('----------')
