@@ -3,7 +3,7 @@ import sys
 import numpy as np
 
 from robot import Robot
-from plotmap import plotMap, plotEstimate, plotMeasurement, plotError
+# from plotmap import plotMap, plotEstimate, plotMeasurement, plotError
 from ekf import predict, update
 from params import n, mapsize
 
@@ -83,7 +83,7 @@ for movement, t in zip(u,range(steps)):
     x_true.append(r1.move(movement))
     obs.append(r1.sense(landmarks))
 
-plotMap(ls,ldt,x_true,r1,mapsize)
+# plotMap(ls,ldt,x_true,r1,mapsize)
 
 # In[Estimation]
 
@@ -98,19 +98,19 @@ cov[:3,:3] = np.zeros((3,3))
 
 c_prob = 0.5*np.ones((n+k,1))
 
-plotEstimate(mu, cov, r1, mapsize)
+# plotEstimate(mu, cov, r1, mapsize)
 
 for movement, measurement in zip(u, obs):
     mu_new, cov = predict(mu_new, cov, movement, Rt)
     mu = np.append(mu,mu_new,axis=1)
-    plotEstimate(mu, cov, r1, mapsize)
+    # plotEstimate(mu, cov, r1, mapsize)
 
     print('Measurements: {0:d}'.format(len(measurement)))
     mu_new, cov, c_prob_new = update(mu_new, cov, measurement, c_prob[:,-1].reshape(n+k,1), Qt)
     mu = np.append(mu,mu_new,axis=1)
     c_prob = np.append(c_prob, c_prob_new, axis=1)
-    plotEstimate(mu, cov, r1, mapsize)
-    plotMeasurement(mu_new, cov, measurement, n)
+    # plotEstimate(mu, cov, r1, mapsize)
+    # plotMeasurement(mu_new, cov, measurement, n)
 
-    plotError(mu,x_true[:len(mu[:,0::2])][:])
+    # plotError(mu,x_true[:len(mu[:,0::2])][:])
     print('----------')
